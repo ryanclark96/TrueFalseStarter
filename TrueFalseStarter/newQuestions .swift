@@ -41,7 +41,7 @@ func generateRoundQuestions() {
     }
 }
 
-// Chooses a question inex and temporarily removes it 
+// Chooses a question inex and temporarily removes it
 func nextQuestion() {
     questionIndex = roundQuestions.remove(at: GKRandomSource.sharedRandom().nextInt(upperBound: roundQuestions.count))
 }
