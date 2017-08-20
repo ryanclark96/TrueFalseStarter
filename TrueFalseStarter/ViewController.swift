@@ -12,32 +12,21 @@ import AudioToolbox
 
 class ViewController: UIViewController {
     
-    let questionsPerRound = 4
-    var questionsAsked = 0
-    var correctQuestions = 0
-    var indexOfSelectedQuestion: Int = 0
+    // Buttons & Labels
+
     
+    // The variables 
+    var questionPerRound = 4
+    var questionsAsked = 0
+    var score = 0
     var gameSound: SystemSoundID = 0
     
-    let trivia: [[String : String]] = [
-        ["Question": "Only female koalas can whistle", "Answer": "False"],
-        ["Question": "Blue whales are technically whales", "Answer": "True"],
-        ["Question": "Camels are cannibalistic", "Answer": "False"],
-        ["Question": "All ducks are birds", "Answer": "True"]
-    ]
-    
-    @IBOutlet weak var questionField: UILabel!
-    @IBOutlet weak var trueButton: UIButton!
-    @IBOutlet weak var falseButton: UIButton!
-    @IBOutlet weak var playAgainButton: UIButton!
-    
-
     override func viewDidLoad() {
         super.viewDidLoad()
         loadGameStartSound()
-        // Start game
+        // Start game 
+        primeTheApp()
         playGameStartSound()
-        displayQuestion()
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,78 +34,126 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func displayQuestion() {
-        indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: trivia.count)
-        let questionDictionary = trivia[indexOfSelectedQuestion]
-        questionField.text = questionDictionary["Question"]
+    // Set up the welcome screen 
+    func primeTheApp() {
+        answerButtonOne.isHidden = true
+        answerButtonTwo.isHidden = true
+        answerButtonThree.ishidden = true
+        anserButtonFour.isHidden = true
+        resultArea.isHidden = true
+        questionArea.text = "Are You ready to quiz?"
+    generateRoundQuestions()
+}
+    // Starts round and asks question form the generated index 
+    @IBAction func startRound() {
+        
+        nextQuestion()
+        
+        questionArea.text = newQuestions[questionIndex].questions
+        answerButtonOne.setTitle(newQuestions[questionIndex].answer[1], for: UIControlState.normal)
+        answerButtonTwo.setTitle(newQuestions[questionIndex].answer[2], for: UIControlState.normal)
+        answerButtonThree.setTitle(newQuestions[questionIndex].answer[3], for: UIControlState.normal)
+        answerButtonFour.settTitle(newQuestions[questionIndex].answer[4], for: UIControlState.normal)
+        
+        answerButtonOne.isHidden = false
+        answerButtonTwo.isHidden = false
+        answerButtonThree.isHidden = false
+        answerButtonFour.isHidden = false
         playAgainButton.isHidden = true
+        resultArea.isHidden = true
+        
+        answerButtonOne.alpha = 1
+        answerButtonTwo.alpha = 1
+        answerButtonThree.alpha = 1
+        answerButtonFour.alpha = 1
     }
     
-    func displayScore() {
-        // Hide the answer buttons
-        trueButton.isHidden = true
-        falseButton.isHidden = true
-        
-        // Display play again button
-        playAgainButton.isHidden = false
-        
-        questionField.text = "Way to go!\nYou got \(correctQuestions) out of \(questionsPerRound) correct!"
-        
-    }
-    
-    @IBAction func checkAnswer(_ sender: UIButton) {
-        // Increment the questions asked counter
+    @IBAction func checkAnswer(_sender: UIButton) {
         questionsAsked += 1
+        print(questionsAsked)
         
-        let selectedQuestionDict = trivia[indexOfSelectedQuestion]
-        let correctAnswer = selectedQuestionDict["Answer"]
+        let answer = newQuestions[questionIndex].correctAnswer
         
-        if (sender === trueButton &&  correctAnswer == "True") || (sender === falseButton && correctAnswer == "False") {
-            correctQuestions += 1
-            questionField.text = "Correct!"
-        } else {
-            questionField.text = "Sorry, wrong answer!"
+        if (sender == answerButtonOne && answer == 1) || (sender == answerButtonTwo && answer == 2) || (sender == answerButtonThree && answer == 3) || (sender == answerButtonFour && answer == 4) {
+            resultArea.text = "Yes \(newQuestions[questionIndex].answers[answer]!) is correct"
+            score += 1
+        }
+        else {
+            resultArea.text = "No sorry it was \(newQuestions[questionIndex].answers[answer]!)."
         }
         
-        loadNextRoundWithDelay(seconds: 2)
+        // Dimming incorrect answers 
+        if newQuestions[questionIndex].correctAnswer == 1 {
+            answerButtonTwo.alpha = 0.3
+            answerButtonThree.alpha = 0.3
+            answerButtonFour.alpha = 0.3
+        } else if newQuestions[questionIndex].correctAnswer == 2 {
+            answerButtonOne.alpha = 0.3
+            answerButtonThree.alpha = 0.3
+            answerButtonFour.alpha = 0.3
+        } else if newQuestions[questionIndex].correctAnswer == 3 {
+            answerButtonOne.alpha = 0.3
+            answerButtonTwo.alpha = 0.3
+            answerButtonFour.alpha = 0.3
+        } else if newQuestions[questionIndex].correctAnswer == 4 {
+            answerButtonOne.alpha = 0.3
+            answerButtonTwo.alpha = 0.3
+            answerButtonThree.alpha = 0.3
+        }
+        
+        resultArea.isHidden = false
+        
+        addDelay()
+        
     }
     
-    func nextRound() {
-        if questionsAsked == questionsPerRound {
-            // Game is over
+    // Delayed transition between questions
+    func loadNextRound() {
+        
+        if questionsAsked == 4 {
             displayScore()
         } else {
-            // Continue game
-            displayQuestion()
+            startRound()
         }
     }
     
-    @IBAction func playAgain() {
-        // Show the answer buttons
-        trueButton.isHidden = false
-        falseButton.isHidden = false
+    func addDelay () {
+        let time = DispatchTime.now() + 2
+        DispatchQueue.main.asyncAfter(deadline: time) {
+            self.loadNextRound()
+        }
+    }
+    
+    // Display final score 
+    func displayScore() {
         
+        switch score {
+        case 0:
+            questionArea.text = "\(score)? That's pretty damn bad."
+        case 1: questionArea.text = "Well, \(score) means you could have technically done worse..."
+        case 2: questionArea.text = "Ok. \(score) is respectable. I guess."
+        case 3: questionArea.text = "Woah. \(score) is an uberdoerpreneuer score."
+        case 4: questionArea.text = "Holy CEO status Batman! \(score) is a grok score."
+        default: break
+        }
+        
+        questionIndex = roundQuestions.remove(at: GKRandomSource.sharedRandom().nextInt(upperBound: roundQuestions.count))
+        generateRoundQuestions()
+        
+        answerButtonOne.isHidden = true
+        answerButtonTwo.isHidden = true
+        answerButtonThree.isHidden = true
+        answerButtonFour.isHidden = true
+        resultArea.isHidden = true
+        playAgainButton.isHidden = false
+        
+        playAgainButton.setTitle("Again?", for: UIControlState.normal)
+        
+        score = 0
         questionsAsked = 0
-        correctQuestions = 0
-        nextRound()
     }
     
-
-    
-    // MARK: Helper Methods
-    
-    func loadNextRoundWithDelay(seconds: Int) {
-        // Converts a delay in seconds to nanoseconds as signed 64 bit integer
-        let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
-        // Calculates a time value to execute the method given current time and delay
-        let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
-        
-        // Executes the nextRound method at the dispatch time on the main queue
-        DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
-            self.nextRound()
-        }
-    }
-    
+    // Loading sound effects
     func loadGameStartSound() {
         let pathToSoundFile = Bundle.main.path(forResource: "GameSound", ofType: "wav")
         let soundURL = URL(fileURLWithPath: pathToSoundFile!)
