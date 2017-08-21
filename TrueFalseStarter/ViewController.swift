@@ -12,9 +12,15 @@ import AudioToolbox
 
 class ViewController: UIViewController {
     
-    // Buttons & Labels
+    // Buttons & Labelsv
+    @IBOutlet weak var questionArea: UILabel!
+    @IBOutlet weak var answerButtonOne: UIButton!
+    @IBOutlet weak var answerButtonTwo: UIButton!
+    @IBOutlet weak var answerButtonThree: UIButton!
+    @IBOutlet weak var answerButtonFour: UIButton!
+    @IBOutlet weak var playAgainButton: UIButton!
+    @IBOutlet weak var resultArea: UILabel!
 
-    
     // The variables 
     var questionPerRound = 4
     var questionsAsked = 0
@@ -38,11 +44,11 @@ class ViewController: UIViewController {
     func primeTheApp() {
         answerButtonOne.isHidden = true
         answerButtonTwo.isHidden = true
-        answerButtonThree.ishidden = true
-        anserButtonFour.isHidden = true
+        answerButtonThree.isHidden = true
+        answerButtonFour.isHidden = true
         resultArea.isHidden = true
         questionArea.text = "Are You ready to quiz?"
-    generateRoundQuestions()
+        generateRoundQuestions()
 }
     // Starts round and asks question form the generated index 
     @IBAction func startRound() {
@@ -53,7 +59,7 @@ class ViewController: UIViewController {
         answerButtonOne.setTitle(newQuestions[questionIndex].answer[1], for: UIControlState.normal)
         answerButtonTwo.setTitle(newQuestions[questionIndex].answer[2], for: UIControlState.normal)
         answerButtonThree.setTitle(newQuestions[questionIndex].answer[3], for: UIControlState.normal)
-        answerButtonFour.settTitle(newQuestions[questionIndex].answer[4], for: UIControlState.normal)
+        answerButtonFour.setTitle(newQuestions[questionIndex].answer[4], for: UIControlState.normal)
         
         answerButtonOne.isHidden = false
         answerButtonTwo.isHidden = false
@@ -68,18 +74,20 @@ class ViewController: UIViewController {
         answerButtonFour.alpha = 1
     }
     
-    @IBAction func checkAnswer(_sender: UIButton) {
-        questionsAsked += 1
-        print(questionsAsked)
+    @IBAction func checkAnswer(_ sender: UIButton) {
+            questionsAsked += 1
+            print(questionsAsked)
         
         let answer = newQuestions[questionIndex].correctAnswer
         
         if (sender == answerButtonOne && answer == 1) || (sender == answerButtonTwo && answer == 2) || (sender == answerButtonThree && answer == 3) || (sender == answerButtonFour && answer == 4) {
-            resultArea.text = "Yes \(newQuestions[questionIndex].answers[answer]!) is correct"
+            
+            resultArea.text = "Yes \(newQuestions[questionIndex].answer[answer]!) is correct"
             score += 1
         }
+            
         else {
-            resultArea.text = "No sorry it was \(newQuestions[questionIndex].answers[answer]!)."
+            resultArea.text = "No sorry it was \(newQuestions[questionIndex].answer[answer]!)."
         }
         
         // Dimming incorrect answers 
@@ -132,8 +140,8 @@ class ViewController: UIViewController {
             questionArea.text = "\(score)? That's pretty damn bad."
         case 1: questionArea.text = "Well, \(score) means you could have technically done worse..."
         case 2: questionArea.text = "Ok. \(score) is respectable. I guess."
-        case 3: questionArea.text = "Woah. \(score) is an uberdoerpreneuer score."
-        case 4: questionArea.text = "Holy CEO status Batman! \(score) is a grok score."
+        case 3: questionArea.text = "Woah. \(score) you are strating to get the hang of it."
+        case 4: questionArea.text = "Woah. \(score) now thats what im talking about."
         default: break
         }
         
